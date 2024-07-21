@@ -65,17 +65,30 @@ const images = [
     description: "Lighthouse Coast Sea"
   }
 ];
-
+const modalListener = (key) => {
+  console.log("Close modal");
+  if (key === "Escape") lightbox.close();
+};
+const lightbox = basicLightbox.create(document.querySelector("template"), {
+  onShow: (lightbox) =>
+    document.addEventListener("keydown", (event) => modalListener(event.key)),
+  onClose: (lightbox) =>
+    document.removeEventListener("keydown", (event) => modalListener(event.key))
+});
 const generateGallery = (images) => {
   const container = document.querySelector(".gallery");
-  let htmlString = "";
-  images.forEach(({ preview, original, description }) => {
-    htmlString += `<li class="gallery-item"><a class="gallery-link" href="${original}"><img class="gallery-image" src="${preview}" data-source="${original}" alt="${description}" /></a></li>`;
+  const htmlString = images.map(({ preview, original, description }, id) => {
+    return `<li id="${id}" class="gallery-item"><a class="gallery-link" href="${original}"><img class="gallery-image" src="${preview}" data-source="${original}" alt="${description}" /></a></li>`;
   });
   container.innerHTML = htmlString;
 
   container.addEventListener("click", (event) => {
-    console.log(event.target);
+    //console.log(event.target.id);
+    const modal = lightbox.element();
+    const img = modal.querySelector("img");
+    img.src = images[event.target.id].original;
+    img.alt = images[event.target.id].description;
+    lightbox.show();
   });
 };
 generateGallery(images);
